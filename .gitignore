@@ -10,7 +10,7 @@ target/
 .springBeans
 
 # Settings
-mavha/
+mavha/*
 
 ### IntelliJ IDEA ###
 .idea
