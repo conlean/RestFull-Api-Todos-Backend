@@ -12,7 +12,7 @@ import java.io.PrintWriter;
 
 public class AuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
-    Logger logger = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationEntryPoint.class);
 
     @Override
     public void commence(final HttpServletRequest request,

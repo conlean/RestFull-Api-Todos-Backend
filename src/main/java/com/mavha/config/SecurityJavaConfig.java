@@ -14,7 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 @EnableWebSecurity
 public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
 
-    private static String REALM="MAVHA_REALM";
+    private static final String REALM = "MAVHA_REALM";
 
     @Autowired
     public void configureGlobalSecurity(AuthenticationManagerBuilder auth) throws Exception {
@@ -32,7 +32,7 @@ public class SecurityJavaConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationEntryPoint getBasicAuthEntryPoint(){
+    public AuthenticationEntryPoint getBasicAuthEntryPoint() {
         return new AuthenticationEntryPoint();
     }
 

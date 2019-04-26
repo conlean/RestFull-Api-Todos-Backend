@@ -1,12 +1,11 @@
 package com.mavha.controller;
 
+import com.mavha.exception.ResourceNotFoundException;
 import com.mavha.model.Todo;
 import com.mavha.repository.TodoRepository;
-import com.mavha.exception.ResourceNotFoundException;
 import com.mavha.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,18 +17,15 @@ import javax.validation.Valid;
 @RequestMapping("/api")
 public class TodoController {
 
-    Logger logger = LoggerFactory.getLogger(TodoController.class);
+    private static final Logger logger = LoggerFactory.getLogger(TodoController.class);
 
     private final StorageService storageService;
+    private final TodoRepository todoRepository;
 
-    @Autowired
-    public TodoController(StorageService storageService) {
+    public TodoController(StorageService storageService, TodoRepository todoRepository) {
         this.storageService = storageService;
+        this.todoRepository = todoRepository;
     }
-
-
-    @Autowired
-    TodoRepository todoRepository;
 
     @GetMapping("/todos")
     public Iterable<Todo> getAllToDos() {
@@ -48,7 +44,7 @@ public class TodoController {
 
     @GetMapping("/todos/{id}")
     public Todo getTodoById(@PathVariable(value = "id") Long toDoid) {
-        logger.info(String.format("Finding Todo id: %s ",toDoid));
+        logger.info(String.format("Finding Todo id: %s ", toDoid));
         return todoRepository.findById(toDoid)
                 .orElseThrow(() -> new ResourceNotFoundException("Todo", "id", toDoid));
     }

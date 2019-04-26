@@ -18,12 +18,10 @@ import java.io.IOException;
 @RequestMapping("/resources")
 public class ImageController {
 
-
-    Logger logger = LoggerFactory.getLogger(ImageController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ImageController.class);
 
     private final StorageService storageService;
 
-    @Autowired
     public ImageController(StorageService storageService) {
         this.storageService = storageService;
     }
