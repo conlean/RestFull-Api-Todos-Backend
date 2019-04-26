@@ -1,8 +1,9 @@
 package com.mavha.controller;
 
+import com.mavha.exception.ResourceNotFoundException;
+import com.mavha.model.State;
 import com.mavha.model.Todo;
 import com.mavha.repository.TodoRepository;
-import com.mavha.exception.ResourceNotFoundException;
 import com.mavha.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,11 +49,33 @@ public class TodoController {
 
     @GetMapping("/todos/{id}")
     public Todo getTodoById(@PathVariable(value = "id") Long toDoid) {
-        logger.info(String.format("Finding Todo id: %s ",toDoid));
+        logger.info(String.format("Finding Todo id: %s ", toDoid));
         return todoRepository.findById(toDoid)
                 .orElseThrow(() -> new ResourceNotFoundException("Todo", "id", toDoid));
     }
 
+    @GetMapping("/todos/")
+    public Iterable<Todo> getTodoBydescriptionAndState(@RequestParam("description") String description,
+                                                       @RequestParam("state") State state) {
+        logger.info(String.format("Finding Todo by Description: %s and state %s", description, state));
+        return todoRepository.findByDescriptionContainsAndState(description, state);
+
+    }
+
+    @GetMapping("/todos/description/")
+    public Iterable<Todo> getTodoBydescription(@RequestParam("description") String description) {
+        logger.info(String.format("Finding Todo by Description: %s ", description));
+        return todoRepository.findByDescriptionContains(description);
+
+    }
+/**
+    @GetMapping("/todos/state/{state}")
+    public Iterable<Todo> getTodoByState(@PathVariable(value = "state") State state) {
+        logger.info(String.format("Finding Todo by State: %s ", state));
+        return todoRepository.findByState(state);
+
+    }
+**/
     @PutMapping("/todos/{id}")
     public Todo updateProduct(@PathVariable(value = "id") Long toDoId,
                               @Valid @RequestBody Todo todoUpdated) {

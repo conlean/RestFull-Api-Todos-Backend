@@ -1,4 +1,4 @@
-package com.mavha;
+package com.mavha.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mavha.storage.StorageService;
@@ -42,15 +42,18 @@ public class TodoControllerTest {
 
     @WithMockUser(value = "user")
     @Test
-    public void deleteTodo_shouldSucceedWith200() throws Exception {
-
-        mvc.perform(MockMvcRequestBuilders.delete("/api/todos/{id}", 1))
-                .andExpect(status().isAccepted());
+    public void givenTodosByDescription_shouldSucceedWith200() throws Exception {
+        mvc.perform(get("/api/todos/description/{description}")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("description", "description"))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
+
 
     @Test
     @WithMockUser(value = "user")
-    public void shouldSaveToDO_shouldSucceedWith200() throws Exception {
+    public void saveToDO_shouldSucceedWith200() throws Exception {
 
         MockMultipartFile file = new MockMultipartFile("file", "other-file-name.jpg", "text/plain", "some other type".getBytes());
         MockMultipartFile todo = new MockMultipartFile("todo", "", "application/json", "{\"description\":\"Test API\", \"state\": \"CREATED\"}".getBytes());
@@ -62,6 +65,14 @@ public class TodoControllerTest {
                 .andExpect(status().isOk());
 
         then(this.storageService).should().store(file);
+    }
+
+    @WithMockUser(value = "user")
+    @Test
+    public void deleteTodo_shouldSucceedWith200() throws Exception {
+
+        mvc.perform(MockMvcRequestBuilders.delete("/api/todos/{id}", 1))
+                .andExpect(status().isAccepted());
     }
 
 
