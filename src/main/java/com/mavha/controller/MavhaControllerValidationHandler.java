@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +40,7 @@ public class MavhaControllerValidationHandler {
 
     /**
      * Handles Resource not found.
+     *
      * @param ex
      * @return message to return
      */

@@ -1,4 +1,4 @@
-package com.mavha;
+package com.mavha.controller;
 
 
 import org.junit.Test;

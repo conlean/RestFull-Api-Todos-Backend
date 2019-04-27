@@ -49,6 +49,12 @@ public class Todo {
     public Todo() {
     }
 
+    public Todo(@NotBlank String description, @NotNull State state, String imageName) {
+        this.description = description;
+        this.state = state;
+        this.imageName = imageName;
+    }
+
     public Long getId() {
         return id;
     }

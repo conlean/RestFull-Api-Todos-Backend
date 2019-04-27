@@ -1,14 +1,5 @@
 package com.mavha.storage;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.stream.Stream;
-
 import com.mavha.config.StorageProperties;
 import com.mavha.exception.StorageException;
 import com.mavha.exception.StorageFileNotFoundException;
@@ -19,6 +10,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.stream.Stream;
 
 @Service
 public class FileSystemStorageService implements StorageService {
@@ -45,10 +45,9 @@ public class FileSystemStorageService implements StorageService {
             }
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, this.rootLocation.resolve(filename),
-                    StandardCopyOption.REPLACE_EXISTING);
+                        StandardCopyOption.REPLACE_EXISTING);
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new StorageException("Failed to store file " + filename, e);
         }
     }
@@ -57,10 +56,9 @@ public class FileSystemStorageService implements StorageService {
     public Stream<Path> loadAll() {
         try {
             return Files.walk(this.rootLocation, 1)
-                .filter(path -> !path.equals(this.rootLocation))
-                .map(this.rootLocation::relativize);
-        }
-        catch (IOException e) {
+                    .filter(path -> !path.equals(this.rootLocation))
+                    .map(this.rootLocation::relativize);
+        } catch (IOException e) {
             throw new StorageException("Failed to read stored files", e);
         }
 
@@ -78,14 +76,12 @@ public class FileSystemStorageService implements StorageService {
             Resource resource = new UrlResource(file.toUri());
             if (resource.exists() || resource.isReadable()) {
                 return resource;
-            }
-            else {
+            } else {
                 throw new StorageFileNotFoundException(
                         "Could not read file: " + filename);
 
             }
-        }
-        catch (MalformedURLException e) {
+        } catch (MalformedURLException e) {
             throw new StorageFileNotFoundException("Could not read file: " + filename, e);
         }
     }
@@ -96,20 +92,19 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public void delete (String filename) {
+    public void delete(String filename) {
         try {
             Files.delete(this.rootLocation.resolve(filename));
         } catch (IOException e) {
-                throw new StorageException("Failed to delete stored files", e);
-            }
+            throw new StorageException("Failed to delete stored files", e);
+        }
     }
 
     @Override
     public void init() {
         try {
             Files.createDirectories(rootLocation);
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new StorageException("Could not initialize storage", e);
         }
     }

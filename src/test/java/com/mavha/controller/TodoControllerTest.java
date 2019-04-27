@@ -1,7 +1,5 @@
-package com.mavha;
+package com.mavha.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mavha.controller.TodoController;
 import com.mavha.model.State;
 import com.mavha.model.Todo;
 import com.mavha.repository.TodoRepository;
@@ -75,11 +73,13 @@ public class TodoControllerTest {
         verify(todoRepository, times(1)).findById(anyLong());
         verify(todoRepository, times(1)).delete(any(Todo.class));
         verify(storageService, times(1)).delete(any());
+
     }
+
 
     @Test
     @WithMockUser(value = "user")
-    public void shouldSaveToDO_shouldSucceedWith200() throws Exception {
+    public void saveToDO_shouldSucceedWith200() throws Exception {
 
         MockMultipartFile file = new MockMultipartFile("file", "other-file-name.jpg", "text/plain", "some other type".getBytes());
         MockMultipartFile todo = new MockMultipartFile("todo", "", "application/json", "{\"description\":\"Test API\", \"state\": \"CREATED\"}".getBytes());
@@ -91,15 +91,6 @@ public class TodoControllerTest {
                 .andExpect(status().isOk());
 
         then(this.storageService).should().store(file);
-    }
-
-
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }
