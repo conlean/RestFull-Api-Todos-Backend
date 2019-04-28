@@ -56,6 +56,8 @@ You can test them using postman or any other rest client.
 + API Crud implementation and validation of parameters.
 + Error handling to build the response (code + message).
 + Supports Security /api/todos/** requests
++ Testing with mockito
++ File server implemented 
 
 ## Possible improvements / out of scope
 
