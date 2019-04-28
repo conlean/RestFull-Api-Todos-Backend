@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Map;
 
 
 @RestController
@@ -58,20 +60,40 @@ public class TodoController {
 
     }
 
-    @GetMapping("/todos/description/")
-    public Iterable<Todo> getTodoBydescription(@RequestParam("description") String description) {
-        logger.info(String.format("Finding Todo by Description: %s ", description));
-        return todoRepository.findByDescriptionContains(description);
+    @GetMapping("/todos/search")
+    public Iterable<Todo> getTodoBySearch(@RequestParam Map<String, String> requestParams) {
+
+        String description = requestParams.get("description");
+        String stateStr = requestParams.get("state");
+        State state = null;
+        if (stateStr != null)
+            state = State.valueOf(stateStr);
+
+        Iterable<Todo> todos = new ArrayList<>();
+
+        if (description != null || state != null) {
+
+            if (description == null) {
+                logger.info(String.format("Finding Todo by state: %s ", stateStr));
+                todos = todoRepository.findByState(state);
+            } else if (state == null) {
+                logger.info(String.format("Finding Todo by Description: %s ", description));
+                todos = todoRepository.findByDescriptionContains(description);
+            } else {
+                logger.info(String.format("Finding Todo by Description: %s and state %s", description, stateStr));
+                todos = todoRepository.findByDescriptionContainsAndState(description, state);
+            }
+        }
+        return todos;
+    }
+
+    @GetMapping("/todos/state/{state}")
+    public Iterable<Todo> getTodoByState(@PathVariable(value = "state") State state) {
+        logger.info(String.format("Finding Todo by State: %s ", state));
+        return todoRepository.findByState(state);
 
     }
 
-    /**
-     * @GetMapping("/todos/state/{state}") public Iterable<Todo> getTodoByState(@PathVariable(value = "state") State state) {
-     * logger.info(String.format("Finding Todo by State: %s ", state));
-     * return todoRepository.findByState(state);
-     * <p>
-     * }
-     **/
     @PutMapping("/todos/{id}")
     public Todo updateProduct(@PathVariable(value = "id") Long toDoId,
                               @Valid @RequestBody Todo todoUpdated) {
