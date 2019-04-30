@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -24,14 +23,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
-
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
@@ -56,15 +54,17 @@ public class TodoControllerTest {
 
 
     @Test
-    @WithMockUser(value = "user")
-    public void saveToDO_shouldSucceedWith200() throws Exception {
+    public void saveToDOWithFile_shouldSucceedWith200() throws Exception {
 
+        // given
         MockMultipartFile file = new MockMultipartFile("file", "other-file-name.jpg", "text/plain", "some other type".getBytes());
-        MockMultipartFile todoMp = new MockMultipartFile("todo", "", "application/json", "{\"description\":\"Test API\", \"state\": \"CREATED\"}".getBytes());
-
+        ObjectMapper mapper = new ObjectMapper();
+        Todo todo = new Todo("Description", State.COMPLETED);
+        //when
         this.mvc.perform(MockMvcRequestBuilders.multipart("/api/todos")
-                .file(todoMp)
-                .file(file))
+                .file(file)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(todo)))
                 .andDo(print())
                 .andExpect(status().isOk());
         //then
@@ -74,8 +74,26 @@ public class TodoControllerTest {
 
     }
 
+    @Test
+    public void saveToDO_shouldSucceedWith200() throws Exception {
 
-    @WithMockUser(value = "user")
+        // given
+        MockMultipartFile file = new MockMultipartFile("file", "other-file-name.jpg", "text/plain", "some other type".getBytes());
+        ObjectMapper mapper = new ObjectMapper();
+        Todo todo = new Todo("Description", State.COMPLETED);
+        //when
+        this.mvc.perform(MockMvcRequestBuilders.post("/api/todos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(todo)))
+                .andDo(print())
+                .andExpect(status().isOk());
+        //then
+        verify(todoRepository, times(1)).save(any(Todo.class));
+
+
+    }
+
+
     @Test
     public void givenTodo_shouldSucceedWith200() throws Exception {
 
@@ -93,7 +111,6 @@ public class TodoControllerTest {
 
     }
 
-    @WithMockUser(value = "user")
     @Test
     public void given_shouldSucceedWith200() throws Exception {
 
@@ -110,18 +127,17 @@ public class TodoControllerTest {
 
     }
 
-    @WithMockUser(value = "user")
     @Test
     public void updateTodo_shouldSucceedWith200() throws Exception {
 
         // given
+        ObjectMapper mapper = new ObjectMapper();
         Todo todo = new Todo("Description", State.COMPLETED);
-        Optional<Todo> todoOptional = Optional.of(todo);
+        Optional<Todo> todoOptional = Optional.of(new Todo("Description", State.INPROGRESS));
 
         //when
         when(todoRepository.findById(1L)).thenReturn(todoOptional);
 
-        ObjectMapper mapper = new ObjectMapper();
         mvc.perform(put("/api/todos/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(todo))
@@ -135,7 +151,6 @@ public class TodoControllerTest {
     }
 
 
-    @WithMockUser(value = "user")
     @Test
     public void deleteTodo_shouldAcceptedWith202() throws Exception {
 
@@ -154,7 +169,6 @@ public class TodoControllerTest {
 
     }
 
-    @WithMockUser(value = "user")
     @Test
     public void givenAllTodosByDescriptionAndState_shouldSucceedWith200() throws Exception {
 
@@ -174,11 +188,10 @@ public class TodoControllerTest {
                 .andExpect(status().isOk());
 
         // then
-        verify(todoRepository, times(1)).findByDescriptionContainsAndState("Todo1",State.CREATED);
+        verify(todoRepository, times(1)).findByDescriptionContainsAndState("Todo1", State.CREATED);
 
     }
 
-    @WithMockUser(value = "user")
     @Test
     public void givenAllTodosByDescription_shouldSucceedWith200() throws Exception {
 
@@ -202,7 +215,6 @@ public class TodoControllerTest {
 
     }
 
-    @WithMockUser(value = "user")
     @Test
     public void givenAllTodosByState_shouldSucceedWith200() throws Exception {
 
@@ -225,7 +237,6 @@ public class TodoControllerTest {
         verify(todoRepository, times(1)).findByState(State.CREATED);
 
     }
-
 
 
 }

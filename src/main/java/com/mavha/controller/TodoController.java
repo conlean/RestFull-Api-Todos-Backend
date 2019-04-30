@@ -17,6 +17,7 @@ import java.util.Map;
 
 
 @RestController
+@CrossOrigin("http://localhost:4200")
 @RequestMapping("/api")
 public class TodoController {
 
@@ -37,10 +38,14 @@ public class TodoController {
     }
 
     @PostMapping("/todos")
-    public Todo createToDo(@Valid @RequestPart("todo") Todo todo, @RequestPart("file") MultipartFile file) {
+    public Todo createToDo(@Valid @RequestBody Todo todo, @RequestPart(value = "file", required = false) MultipartFile file) {
         logger.info(String.format("Saving todo Title: %s ", todo.getDescription()));
-        storageService.store(file);
-        todo.setImageName(file.getOriginalFilename());
+
+        if (file != null) {
+            storageService.store(file);
+            todo.setImageName(file.getOriginalFilename());
+        }
+
         return todoRepository.save(todo);
     }
 
@@ -102,11 +107,11 @@ public class TodoController {
                 .orElseThrow(() -> new ResourceNotFoundException("Todo", "id", toDoId));
 
         todo.setState(todoUpdated.getState());
+        todoRepository.save(todo);
 
-        Todo updatedTodo = todoRepository.save(todo);
         logger.info(String.format("todo Title: %s was updated", todo.getDescription()));
 
-        return updatedTodo;
+        return todo;
     }
 
     @DeleteMapping("/todos/{id}")
@@ -114,7 +119,9 @@ public class TodoController {
         Todo todo = todoRepository.findById(toDoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Todo", "id", toDoId));
 
-        storageService.delete(todo.getImageName());
+        if (todo.getImageName() != null)
+            storageService.delete(todo.getImageName());
+
         todoRepository.delete(todo);
 
         logger.info(String.format("Todo id:  %s deleted ", toDoId));
