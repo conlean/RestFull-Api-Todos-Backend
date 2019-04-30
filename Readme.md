@@ -1,6 +1,6 @@
-# Java, Maven, Spring Boot, Spring Security, HSQLDB, JPA, Hibernate Rest API
+# Java, Maven, Spring Boot, HSQLDB, JPA, Hibernate Rest API
 
-This is an example Restful CRUD API built on top of Spring Boot + Security + HSQLDB as part of a challenge in the recruiting process.
+This is an example Restful CRUD ToDo API built on top of Spring Boot + HSQLDB as part of a challenge in the recruiting process.
 
 ## Requirements
 
@@ -47,15 +47,13 @@ The app defines following CRUD APIs.
 
 You can test them using postman or any other rest client.
 
-    You must to add Basic Auth in your rest client. 
+    You must to add Cords to TodoController. 
 
-+ open `SecurityJavaConfig`and you can find 1 roles and credentials
 
 ## Key points to see as an example
 
 + API Crud implementation and validation of parameters.
 + Error handling to build the response (code + message).
-+ Supports Security /api/todos/** requests
 + Testing with mockito
 + File server implemented 
 
