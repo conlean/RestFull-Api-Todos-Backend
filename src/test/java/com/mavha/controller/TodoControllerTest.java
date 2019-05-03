@@ -78,7 +78,6 @@ public class TodoControllerTest {
     public void saveToDO_shouldSucceedWith200() throws Exception {
 
         // given
-        MockMultipartFile file = new MockMultipartFile("file", "other-file-name.jpg", "text/plain", "some other type".getBytes());
         ObjectMapper mapper = new ObjectMapper();
         Todo todo = new Todo("Description", State.COMPLETED);
         //when
@@ -107,6 +106,43 @@ public class TodoControllerTest {
                 .andExpect(status().isOk());
         // then
         verify(todoRepository, times(1)).findById(anyLong());
+
+
+    }
+
+    @Test
+    public void givenBoard_shouldSucceedWith200() throws Exception {
+
+        // given
+        List<Todo> mockedTodoCompleted = new LinkedList<>();
+        Todo todo = new Todo("Todo1", State.COMPLETED);
+        Todo todo2 = new Todo("Todo1", State.COMPLETED);
+        mockedTodoCompleted.add(todo);
+        mockedTodoCompleted.add(todo2);
+
+        List<Todo> mockedTodoCreated = new LinkedList<>();
+        todo = new Todo("Todo1", State.CREATED);
+        todo2 = new Todo("Todo1", State.CREATED);
+        mockedTodoCreated.add(todo);
+        mockedTodoCreated.add(todo2);
+
+        List<Todo> mockedTodoInProgress = new LinkedList<>();
+        todo = new Todo("Todo1", State.INPROGRESS);
+        todo2 = new Todo("Todo1", State.INPROGRESS);
+        mockedTodoInProgress.add(todo);
+        mockedTodoInProgress.add(todo2);
+
+
+        when(todoRepository.findByState(State.COMPLETED)).thenReturn(mockedTodoCompleted);
+        when(todoRepository.findByState(State.INPROGRESS)).thenReturn(mockedTodoInProgress);
+        when(todoRepository.findByState(State.CREATED)).thenReturn(mockedTodoCreated);
+        //when
+        mvc.perform(MockMvcRequestBuilders.get("/api/todos/board")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+        // then
+        verify(todoRepository, times(3)).findByState(any());
 
 
     }
@@ -165,7 +201,7 @@ public class TodoControllerTest {
         // then
         verify(todoRepository, times(1)).findById(anyLong());
         verify(todoRepository, times(1)).delete(any(Todo.class));
-        verify(storageService, times(1)).delete(any());
+       // verify(storageService, times(1)).delete(any());
 
     }
 

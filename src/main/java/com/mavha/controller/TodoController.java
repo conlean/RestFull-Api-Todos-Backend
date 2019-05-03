@@ -3,6 +3,7 @@ package com.mavha.controller;
 import com.mavha.exception.ResourceNotFoundException;
 import com.mavha.model.State;
 import com.mavha.model.Todo;
+import com.mavha.model.Board;
 import com.mavha.repository.TodoRepository;
 import com.mavha.storage.StorageService;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 
@@ -35,6 +37,20 @@ public class TodoController {
     public Iterable<Todo> getAllToDos() {
         logger.info("getting all ToDos");
         return todoRepository.findAll();
+    }
+
+    @GetMapping("/todos/board")
+    public List<Board> getBoard() {
+
+        logger.info("getting all board");
+        List<Board> board = new ArrayList<>();
+
+        board.add(new Board("Created", State.CREATED, todoRepository.findByState(State.CREATED)));
+        board.add(new Board("In Progress", State.INPROGRESS, todoRepository.findByState(State.INPROGRESS)));
+        board.add(new Board("Completed", State.COMPLETED, todoRepository.findByState(State.COMPLETED)));
+
+
+        return board;
     }
 
     @PostMapping("/todos")
